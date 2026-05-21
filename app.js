@@ -26,6 +26,7 @@ class ImageEditor {
     
     init() {
         this.bindEvents();
+        this.bindMobileMenu();
         this.updateUI();
     }
     
@@ -473,6 +474,38 @@ class ImageEditor {
     
     showLoading(show) {
         document.getElementById('loading').hidden = !show;
+    }
+    
+    // 移动端菜单控制
+    bindMobileMenu() {
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        // 打开侧边栏
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        });
+        
+        // 点击遮罩关闭
+        overlay.addEventListener('click', () => {
+            this.closeMobileMenu();
+        });
+        
+        // 点击侧边栏内的按钮后自动关闭
+        sidebar.querySelectorAll('.filter-btn, .btn-effect, .btn-icon').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth <= 600) {
+                    this.closeMobileMenu();
+                }
+            });
+        });
+    }
+    
+    closeMobileMenu() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('active');
     }
 }
 
