@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 图生视频 - ImageR Pro</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 3h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                        <circle cx="9" cy="9" r="2"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                    <span>ImageR Pro</span>
+                </div>
+                <nav class="nav">
+                    <a href="#" class="nav-link">编辑</a>
+                    <a href="#" class="nav-link active">视频生成</a>
+                    <a href="#" class="nav-link">帮助</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-ghost">登录</button>
+                    <button class="btn btn-primary">免费试用</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主容器 -->
+        <main class="main-content">
+            <div class="container">
+                <!-- 标签页 -->
+                <div class="tabs">
+                    <button class="tab-btn" data-tab="upload">1️⃣ 上传图片</button>
+                    <button class="tab-btn" data-tab="configure">2️⃣ 配置参数</button>
+                    <button class="tab-btn" data-tab="progress">3️⃣ 生成进度</button>
+                </div>
+
+                <!-- 标签页内容 -->
+                <div class="tabs-content">
+                    <!-- 上传图片标签页 -->
+                    <div id="uploadTab" class="tab-content">
+                        <div class="panel">
+                            <h2>上传图片</h2>
+                            <p class="subtitle">选择一张图片，AI 将为其生成动画视频</p>
+
+                            <div id="imageDropZone" class="drop-zone">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <h3>拖拽图片到这里</h3>
+                                <p>或点击下方按钮选择</p>
+                                <button id="uploadImageBtn" class="btn btn-primary" style="margin-top: 16px;">选择图片</button>
+                                <input type="file" id="imageInput" accept="image/*" hidden>
+                            </div>
+
+                            <div id="imagePreviewContainer" style="margin-top: 24px; display: none;">
+                                <h3>预览</h3>
+                                <img id="imagePreview" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 12px;">
+                                <p id="imageInfo" style="margin-top: 8px; color: #6b7280; font-size: 14px;"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 配置参数标签页 -->
+                    <div id="configureTab" class="tab-content">
+                        <div class="panel">
+                            <h2>配置视频参数</h2>
+                            <p class="subtitle">设置视频生成的相关参数</p>
+
+                            <div class="form-group">
+                                <label for="promptInput">📝 视频描述（提示词）</label>
+                                <textarea 
+                                    id="promptInput" 
+                                    placeholder="例如：一个人在海边走路，阳光洒落，微风吹动衣服..."
+                                    rows="4"
+                                    style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: inherit;"
+                                ></textarea>
+                                <small style="color: #6b7280; margin-top: 4px;">详细的描述有助于生成更好的视频效果</small>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="durationSelect">⏱️ 视频长度</label>
+                                    <select id="durationSelect" style="width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                                        <option value="3">3 秒</option>
+                                        <option value="5" selected>5 秒</option>
+                                        <option value="10">10 秒</option>
+                                        <option value="15">15 秒</option>
+                                        <option value="30">30 秒</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="styleSelect">🎨 视频风格</label>
+                                    <select id="styleSelect" style="width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                                        <option value="realistic">逼真</option>
+                                        <option value="anime">动画</option>
+                                        <option value="oil-painting">油画</option>
+                                        <option value="watercolor">水彩</option>
+                                        <option value="cyberpunk">赛博朋克</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button id="generateBtn" class="btn btn-primary btn-large" disabled style="width: 100%; margin-top: 24px;">
+                                🚀 开始生成视频
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 进度标签页 -->
+                    <div id="progressTab" class="tab-content">
+                        <div class="panel">
+                            <h2>生成进度</h2>
+                            <p class="subtitle" id="statusText">等待开始...</p>
+
+                            <div class="progress-container" style="margin: 32px 0;">
+                                <div class="progress-bar-bg">
+                                    <div id="progressBar" class="progress-bar-fill"></div>
+                                </div>
+                                <p id="progressText" style="text-align: center; margin-top: 12px; font-size: 24px; font-weight: bold; color: #4f46e5;">0%</p>
+                            </div>
+
+                            <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 24px 0;">
+                                <h4 style="margin: 0 0 12px 0; color: #111827;">🎬 生成中的参数</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">
+                                    <div>
+                                        <span style="color: #6b7280;">图片：</span>
+                                        <span id="paramImage" style="font-weight: 500;">-</span>
+                                    </div>
+                                    <div>
+                                        <span style="color: #6b7280;">长度：</span>
+                                        <span id="paramDuration" style="font-weight: 500;">-</span>
+                                    </div>
+                                    <div>
+                                        <span style="color: #6b7280;">风格：</span>
+                                        <span id="paramStyle" style="font-weight: 500;">-</span>
+                                    </div>
+                                    <div>
+                                        <span style="color: #6b7280;">任务ID：</span>
+                                        <span id="paramTaskId" style="font-weight: 500; word-break: break-all;">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button id="downloadBtn" class="btn btn-success btn-large" disabled style="width: 100%;">
+                                ⬇️ 下载视频
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 全局加载动画 -->
+        <div id="globalLoading" class="loading-overlay" style="display: none;">
+            <div class="spinner"></div>
+            <p>处理中...</p>
+        </div>
+    </div>
+
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+    <script src="/video-generator.js"></script>
+</body>
+</html>
